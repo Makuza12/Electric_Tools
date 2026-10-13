@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELECTRIC TOOLS Store</title>
+    <!-- Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg-color: var(--tg-theme-bg-color, #f8f9fa);
+            --text-color: var(--tg-theme-text-color, #212529);
+            --button-color: var(--tg-theme-button-color, #0d6efd);
+            --button-text-color: var(--tg-theme-button-text-color, #ffffff);
+            --card-bg: var(--tg-theme-secondary-bg-color, #ffffff);
+            --border-color: #dee2e6;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            padding-bottom: 70px; /* Space for bottom nav */
+        }
+
+        /* Top Header */
+        header 
+	{
+            background-color: var(--card-bg);
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header h1 
+	{
+            font-size: 18px;
+            margin: 0;
+            font-weight: 700;
+        }
+
+        /* Category Horizontal Scroll Bar */
+        .category-container {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 12px 16px;
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+            scrollbar-width: none; /* Hide scrollbar for clean mobile UI */
+        }
+
+        .category-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .cat-chip {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .cat-chip.active {
+            background-color: var(--button-color);
+            color: var(--button-text-color);
+            border-color: var(--button-color);
+        }
+
+        /* Main Content Container */
+        .container {
+            padding: 16px;
+        }
+
+        /* Product Grid */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .product-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 110px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            background-color: #eee;
+        }
+
+        .product-brand {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #6c757d;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        .product-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            line-height: 1.2;
+            height: 32px;
+            overflow: hidden;
+        }
+
+        .product-price {
+            font-size: 13px;
+            color: var(--button-color);
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .action-btn {
+            background-color: var(--button-color);
+            color: var(--button-text-color);
+            border: none;
+            border-radius: 8px;
+            padding: 7px;
+            font-size: 12px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+        }
+
+        /* Admin Upload Section */
+        .admin-section {
+            margin-top: 30px;
+            background: var(--card-bg);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px dashed var(--button-color);
+        }
+
+        .admin-section h3 {
+            margin-top: 0;
+            font-size: 16px;
+        }
+
+        .admin-section input, .admin-section select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-sizing: border-box;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        /* Bottom Navigation Bar */
+        .top-nav 
+	{
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            z-index: 100;
+        }
+
+        .nav-item 
+	{
+            text-align: center;
+            font-size: 12px;
+            color: #6c757d;
+            cursor: pointer;
+            background: none;
+            border: none;
+            flex: 1;
+        }
+
+        .nav-item.active {
+            color: var(--button-color);
+            font-weight: bold;
+        }
+
+        /* Contact View */
+        .view-section {
+            display: none;
+        }
+        .view-section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <h1>ELECTRIC TOOLS Store</h1>
+        <h2>ELECTRIC TOOLS Store</h2>
+    </header>
+
+    <!-- HOME VIEW -->
+    <div id="homeView" class="view-section active">
+        <!-- Category Horizontal Bar -->
+        <div class="category-container" id="categoryBar">
+            <div class="cat-chip active" onclick="filterCategory('ALL')">CATEGORY</div>
+            <div class="cat-chip" onclick="filterCategory('FLUKE')">FLUKE</div>
+            <div class="cat-chip" onclick="filterCategory('HIOKI')">HIOKI</div>
+            <div class="cat-chip" onclick="filterCategory('KYORITSU')">KYORITSU</div>
+            <div class="cat-chip" onclick="filterCategory('UNI-T')">UNI-T</div>
+            <div class="cat-chip" onclick="filterCategory('FLIR')">FLIR</div>
+            <div class="cat-chip" onclick="filterCategory('INSIZE')">INSIZE</div>
+            <div class="cat-chip" onclick="filterCategory('MITUTOYO')">MITUTOYO</div>
+            <div class="cat-chip" onclick="filterCategory('LS Electric')">LS Electric</div>
+            <div class="cat-chip" onclick="filterCategory('HOCHIKI')">HOCHIKI</div>
+            <div class="cat-chip" onclick="filterCategory('NOHMI')">NOHMI</div>
+        </div>
+
+        <div class="container">
+            <!-- Product Grid -->
+            <div class="product-grid" id="productGrid">
+                <!-- Dynamic Products Loaded Here -->
+            </div>
+
+<!-- CONTACT US VIEW -->
+    <div id="contactView" class="view-section">
+        <div class="container" style="text-align: center; margin-top: 40px;">
+            <h2>CONTACT US</h2>
+            <p style="font-size: 14px; color: #6c757d;">For inquiries regarding industrial testing instruments, MEP equipment, and safety systems:</p>
+            <p style="font-weight: bold; margin-top: 20px;">📍 CamKlang Building</p>
+            <p style="font-weight: bold;">📧 sales@emin-kh.com</p>
+            <button class="action-btn" style="margin-top: 20px;" onclick="window.Telegram.WebApp.openTelegramLink('https://t.me/your_sales_support')">Chat with Sales Engineer</button>
+        </div>
+    </div>
+
+    <!-- Top Navigation Bar -->
+    <nav class="top-nav">
+        <button class="nav-item active" id="navHome" onclick="switchTab('home')">
+            <br>HOME
+        </button>
+        <button class="nav-item" id="navCategories" onclick="switchTab('home'); scrollToCategories();">
+            <br>CATEGORY
+        </button>
+        <button class="nav-item" id="navContact" onclick="switchTab('contact')">
+            <br>CONTACT US
+        </button>
+    </nav>
+
+    <script>
+        // Initialize Telegram WebApp
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+
+        // Initial Sample Products
+        let products = [
+            { id: 1, name: "Fluke 117 True RMS Digital Multimeter", brand: "FLUKE", price: "$285.00", image: "https://images.unsplash.com/photo-1581092160607-ee22621dd758" },
+            { id: 2, name: "Hioki 3288 Clamp On HiTester", brand: "HIOKI", price: "$145.00", image: "https://images.unsplash.com/photo-1581092335397-9583fe92d232" }
+        ];
+
+        let currentCategory = 'ALL';
+
+        function renderProducts() {
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = '';
+
+            let filtered = currentCategory === 'ALL' 
+                ? products 
+                : products.filter(p => p.brand === currentCategory);
+
+            if(filtered.length === 0) {
+                grid.innerHTML = `<p style="grid-column: span 2; text-align: center; color: #6c757d; font-size: 13px;">No products available under ${currentCategory}.</p>`;
+                document.getElementById('itemCount').innerText = `Items: 0`;
+                return;
+            }
+
+            filtered.forEach(p => {
+                grid.innerHTML += `
+                    <div class="product-card">
+                        <div>
+                            <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+                            <div class="product-brand">${p.brand}</div>
+                            <div class="product-title">${p.name}</div>
+                            <div class="product-price">${p.price}</div>
+                        </div>
+                        <button class="action-btn" onclick="orderItem('${p.name}', '${p.price}')">Order Now</button>
+                    </div>
+                `;
+            });
+            document.getElementById('itemCount').innerText = `Items: ${filtered.length}`;
+        }
+
+        function filterCategory(brand) {
+            currentCategory = brand;
+            
+            // Update chip active states
+            document.querySelectorAll('.cat-chip').forEach(chip => {
+                if(chip.innerText.trim() === brand || (brand === 'ALL' && chip.innerText.includes('All'))) {
+                    chip.classList.add('active');
+                } else {
+                    chip.classList.remove('active');
+                }
+            });
+
+            renderProducts();
+        }
+
+        function addNewProduct() {
+            const name = document.getElementById('pName').value;
+            const price = document.getElementById('pPrice').value;
+            const brand = document.getElementById('pBrand').value;
+            const image = document.getElementById('pImage').value;
+
+            if(!name || !price) {
+                alert("Please fill in product name and price!");
+                return;
+            }
+
+            products.push({
+                id: products.length + 1,
+                name: name,
+                brand: brand,
+                price: price.startsWith('$') ? price : `$${price}`,
+                image: image || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158'
+            });
+
+            Clear inputs
+            document.getElementById('pName').value = '';
+            document.getElementById('pPrice').value = '';
+            document.getElementById('pImage').value = '';
+
+            renderProducts();
+            alert("Product successfully added locally!");
+        }
+
+        function orderItem(name, price) {
+            tg.MainButton.text = `Checkout: ${name} (${price})`;
+            tg.MainButton.show();
+            alert(`Selected: ${name}. Telegram Main Button activated! You can link this to send order data back to your bot.`);
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+            if(tab === 'home') {
+                document.getElementById('homeView').classList.add('active');
+                document.getElementById('navHome').classList.add('active');
+            } else if(tab === 'contact') {
+                document.getElementById('contactView').classList.add('active');
+                document.getElementById('navContact').classList.add('active');
+            }
+        }
+
+        function scrollToCategories() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        Initial render call
+        renderProducts();
+    </script>
+</body>
+
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELECTRIC TOOLS Store</title>
+    <!-- Include Telegram Web App Script -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg-color: var(--tg-theme-bg-color, #ffffff);
+            --text-color: var(--tg-theme-text-color, #222222);
+            --button-color: var(--tg-theme-button-color, #2481cc);
+            --button-text-color: var(--tg-theme-button-text-color, #ffffff);
+            --card-bg: var(--tg-theme-secondary-bg-color, #f4f4f5);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 16px;
+        }
+
+        h1 {
+            font-size: 22px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .product-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .product-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .product-price {
+            font-size: 13px;
+            color: var(--button-color);
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .buy-btn {
+            background-color: var(--button-color);
+            color: var(--button-text-color);
+            border: none;
+            border-radius: 8px;
+            padding: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .admin-section {
+            margin-top: 30px;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+
+        .admin-section input, .admin-section button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>ELECTRIC TOOLS Store</h1>
+
+    <!-- Product Listing Grid -->
+    <div class="product-grid" id="productGrid">
+        <!-- Products will load here dynamically -->
+    </div>
+
+    <!-- Simple Admin Upload Section (Demo) -->
+    <div class="admin-section">
+        <h3>Add New Product (Admin Demo)</h3>
+        <input type="text" id="pName" placeholder="Product Name">
+        <input type="text" id="pPrice" placeholder="Price ($)">
+        <input type="text" id="pImage" placeholder="Image URL (e.g. Unsplash link)">
+        <button class="buy-btn" onclick="addProduct()">Upload Product</button>
+    </div>
+
+    <script>
+        // Initialize Telegram Web App
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+
+// Sample initial products
+        let products = [
+            { id: 1, name: "Wireless Earbuds", price: "$25.00", image: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df" },
+            { id: 2, name: "Smart Watch", price: "$45.00", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30" }
+        ];
+
+        function renderProducts() {
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = '';
+            products.forEach(p => {
+                grid.innerHTML += `
+                    <div class="product-card">
+                        <div>
+                            <img src="${p.image}" alt="${p.name}">
+                            <div class="product-title">${p.name}</div>
+                            <div class="product-price">${p.price}</div>
+                        </div>
+                        <button class="buy-btn" onclick="buyItem('${p.name}')">Buy Now</button>
+                    </div>
+                `;
+            });
+        }
+
+        function addProduct() {
+            const name = document.getElementById('pName').value;
+            const price = document.getElementById('pPrice').value;
+            const image = document.getElementById('pImage').value;
+
+            if(!name || !price) {
+                alert("Please fill in product name and price!");
+                return;
+            }
+
+            products.push({ id: products.length + 1, name, price: `$${price}`, image: image || 'https://via.placeholder.com/150' });
+            renderProducts();
+
+            // Clear inputs
+            document.getElementById('pName').value = '';
+            document.getElementById('pPrice').value = '';
+            document.getElementById('pImage').value = '';
+            alert("Product uploaded locally!");
+        }
+
+        function buyItem(itemName) {
+            tg.MainButton.text = `Checkout: ${itemName}`;
+            tg.MainButton.show();
+            alert(`Selected: ${itemName}. Telegram Main Button activated!`);
+        }
+
+        // Initial render
+        renderProducts();
+    </script>
+</body>
+</html>
